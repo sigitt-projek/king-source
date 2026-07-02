@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(-45deg,#0f172a,#1e3a8a,#06b6d4,#111827);
+    background-size:400% 400%;
+    animation:bgMove 10s ease infinite;
+}
+
+.card{
+    text-align:center;
+    padding:40px;
+    width:90%;
+    max-width:500px;
+    border-radius:20px;
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(15px);
+    border:1px solid rgba(255,255,255,.2);
+    color:white;
+    animation:pop 1s;
+}
+
+.logo{
+    font-size:90px;
+    animation:float 2s ease-in-out infinite;
+}
+
+h1{
+    margin:15px 0;
+    font-size:36px;
+}
+
+p{
+    color:#ddd;
+    line-height:1.6;
+    margin-bottom:30px;
+}
+
+button{
+    padding:15px 45px;
+    font-size:20px;
+    border:none;
+    border-radius:40px;
+    cursor:pointer;
+    color:white;
+    background:#00bfff;
+    transition:.3s;
+}
+
+button:hover{
+    transform:scale(1.08);
+    box-shadow:0 0 25px #00bfff;
+}
+
+.fade{
+    animation:fadeOut .8s forwards;
+}
+
+@keyframes pop{
+    from{
+        transform:scale(.6);
+        opacity:0;
+    }
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+@keyframes float{
+    0%,100%{
+        transform:translateY(0);
+    }
+    50%{
+        transform:translateY(-12px);
+    }
+}
+
+@keyframes fadeOut{
+    to{
+        opacity:0;
+        transform:scale(1.1);
+    }
+}
+
+@keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+.menu{
+    margin-top:25px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.menu a{
+    text-decoration:none;
+    color:white;
+    background:rgba(255,255,255,.1);
+    padding:12px;
+    border-radius:12px;
+    transition:.3s;
+    border:1px solid rgba(255,255,255,.15);
+}
+
+.menu a:hover{
+    background:#00bfff;
+    transform:translateY(-3px);
+    box-shadow:0 0 15px #00bfff;
+}
+</style>
+
+</head>
+<body>
+
+<div class="card" id="card">
+
+<div class="logo">🎯</div>
+
+<h1>Latihan Ks</h1>
+
+<p>
+Terima kasih sudah mencoba game gabut saya.<br>
+Semoga Anda menikmati permainannya dan mendapatkan skor setinggi mungkin!
+#Jefri Gntengs
+</p>
+
+<button id="play">🎮 Mulai Game</button>
+
+<div class="menu">
+
+<a href="https://wa.me/6285363921814" target="_blank">
+💬 Chat Admin
+</a>
+
+<a href="https://wa.me/6285363921814?text=Halo%20Admin,%20Saya%20ingin%20melaporkan%20bug%20di%20game." target="_blank">
+🐞 Lapor Bug
+</a>
+
+<a href="https://instagram.com/zfranzxkaciw_" target="_blank">
+📷 Instagram
+</a>
+
+<a href="https://tiktok.com/@keizernihbree" target="_blank">
+🎵 TikTok
+</a>
+
+<a href="https://youtube.com/@username" target="_blank">
+💸 Topup Robux
+</a>
+
+</div>
+
+</div>
+
+<script>
+
+document.getElementById("play").onclick=function(){
+
+    document.getElementById("card").classList.add("fade");
+
+    setTimeout(function(){
+
+        window.location.href="index.html";
+
+    },800);
+
+}
+
+</script>
+
+</body>
+</html>
