@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KS VIDI</title>
+
+<style>
+body{
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    color:white;
+    background:
+    radial-gradient(circle at top,#00c6ff,#111 70%);
+}
+.box{
+    text-align:center;
+    padding:25px;
+    border-radius:25px;
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(15px);
+    box-shadow:
+    0 0 40px rgba(0,255,255,.3),
+    inset 0 0 20px rgba(255,255,255,.1);
+}
+canvas{
+    background:#1d1d1d;
+    border-radius:15px;
+    box-shadow:0 0 20px cyan;
+}
+button{
+    margin-top:18px;
+    padding:15px 45px;
+    font-size:22px;
+    font-weight:bold;
+    border:none;
+    border-radius:50px;
+    cursor:pointer;
+    color:white;
+    background:linear-gradient(90deg,#00d2ff,#3a7bd5);
+    transition:.25s;
+}
+
+button:hover{
+    transform:scale(1.08);
+    box-shadow:0 0 25px cyan;
+}
+
+button:active{
+    transform:scale(.95);
+}
+#msg{
+    height:45px;
+    margin-top:15px;
+    font-size:36px;
+    font-weight:bold;
+    animation-duration:.4s;
+}
+@keyframes pop{
+    0%{transform:scale(.3);opacity:0;}
+    50%{transform:scale(1.3);}
+    100%{transform:scale(1);opacity:1;}
+}
+.score{
+    margin-top:10px;
+    font-size:18px;
+}
+#loading{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100dvh;
+    background:linear-gradient(160deg,#00111f,#003b55,#000814);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:99999;
+    transition:opacity .7s ease;
+}
+
+#loading.hide{
+    opacity:0;
+    pointer-events:none;
+}
+
+.loader{
+    width:min(18vw,90px);
+    height:min(18vw,90px);
+    border:min(1.8vw,8px) solid rgba(255,255,255,.15);
+    border-top-color:#00ffff;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+#loading h1{
+    margin-top:24px;
+    color:white;
+    font-size:clamp(28px,6vw,52px);
+}
+
+#loading p{
+    margin-top:8px;
+    color:#8eefff;
+    font-size:clamp(14px,3vw,20px);
+}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    touch-action:manipulation;
+    -webkit-text-size-adjust:100%;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#111;
+    font-family:Arial,sans-serif;
+}
+.score{
+    margin-top:18px;
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.score span{
+    color:#00ffcc;
+    font-weight:bold;
+}
+.title{
+    margin-bottom:15px;
+    font-size:45px;
+    color:#00ffff;
+    text-shadow:
+    0 0 15px cyan,
+    0 0 30px cyan;
+}
+/* Animasi saat kalah */
+.gameOverEffect{
+    animation:
+        screenShake .5s,
+        screenFlash .8s;
+}
+
+@keyframes screenShake{
+
+0%{transform:translate(0,0);}
+15%{transform:translate(-10px,4px);}
+30%{transform:translate(10px,-4px);}
+45%{transform:translate(-8px,-3px);}
+60%{transform:translate(8px,3px);}
+75%{transform:translate(-5px,2px);}
+100%{transform:translate(0,0);}
+
+}
+
+@keyframes screenFlash{
+
+0%{
+    filter:brightness(1);
+}
+
+30%{
+    filter:brightness(2) saturate(2);
+}
+
+60%{
+    filter:brightness(.4);
+}
+
+100%{
+    filter:brightness(1);
+}
+
+}
+
+canvas.dead{
+
+animation:canvasDead .8s forwards;
+
+}
+
+@keyframes canvasDead{
+
+0%{
+
+transform:scale(1);
+
+}
+
+60%{
+
+transform:scale(.92) rotate(-3deg);
+
+}
+
+100%{
+
+transform:scale(.75);
+
+filter:blur(5px) grayscale(100%) brightness(.25);
+
+}
+
+}
+#gameOver{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    opacity:0;
+    visibility:hidden;
+
+    transition:.4s;
+
+    z-index:9999;
+}
+
+#gameOver.show{
+
+    opacity:1;
+    visibility:visible;
+
+}
+
+.gameBox{
+
+    width:90%;
+    max-width:350px;
+
+    padding:30px;
+
+    border-radius:20px;
+
+    background:#222;
+
+    text-align:center;
+
+    border:2px solid red;
+
+    animation:popGame .5s;
+
+    box-shadow:0 0 35px red;
+
+}
+
+.gameBox h1{
+
+    color:#ff4444;
+    font-size:42px;
+
+}
+
+.gameBox p{
+
+    margin:20px 0;
+    font-size:22px;
+
+}
+
+@keyframes popGame{
+
+0%{
+
+transform:scale(.2) rotate(-15deg);
+
+opacity:0;
+
+}
+
+70%{
+
+transform:scale(1.08);
+
+}
+
+100%{
+
+transform:scale(1);
+
+opacity:1;
+
+}
+
+}
+</style>
+
+</head>
+<body>
+
+<div id="loading">
+    <div class="loader"></div>
+
+    <h1>KS VIDI</h1>
+
+    <p>Loading...</p>
+</div>
+
+<div class="box">
+    
+<h1 class="title">JEFRI ATAU ZAFRAN NI</h1>
+
+<canvas id="c" width="500" height="500"></canvas>
+
+<br>
+
+<button onclick="shoot()">PENCET</button>
+
+<div id="msg"></div>
+
+<div class="score">
+Perfect :
+<span id="p">0</span>
+|
+Good :
+<span id="g">0</span>
+|
+Noob :
+<span id="n">0</span>
+</div>
+<div class="info">
+
+❤️ Nyawa :
+<span id="life">3</span>
+
+|
+
+⭐ Level :
+<span id="level">1</span>
+
+|
+
+🔥 Combo :
+<span id="combo">0</span>
+
+|
+
+🏆 High Score :
+<span id="high">0</span>
+
+|
+
+💰 Score :
+<span id="score">0</span>
+
+</div>
+
+</div>
+
+<script>
+
+window.addEventListener("load",()=>{
+
+    setTimeout(()=>{
+
+        document.getElementById("loading").classList.add("hide");
+
+        setTimeout(()=>{
+            document.getElementById("loading").remove();
+        },700);
+
+    },1800);
+
+});
+
+const canvas=document.getElementById("c");
+const ctx=canvas.getContext("2d");
+
+const cx=250;
+const cy=250;
+const r=170;
+
+let angle=0;
+let speed=0.07;
+
+let target=Math.random()*360;
+
+let perfect=0;
+let good=0;
+let noob=0;
+let combo = 0;
+let highScore = Number(localStorage.getItem("highScore")) || 0;
+
+let score = 0;
+let level = 1;
+let lives = 3;
+
+const comboText = document.getElementById("combo");
+const levelText = document.getElementById("level");
+const lifeText = document.getElementById("life");
+const highText = document.getElementById("high");
+const scoreText = document.getElementById("score");
+
+let flash=0;
+
+function newTarget(){
+    target=Math.random()*360;
+}
+
+function draw(){
+
+ctx.clearRect(0,0,500,500);
+
+// lingkaran
+ctx.beginPath();
+ctx.arc(cx,cy,r,0,Math.PI*2);
+ctx.lineWidth=5;
+ctx.strokeStyle="white";
+ctx.stroke();
+
+// target
+ctx.save();
+ctx.translate(cx,cy);
+ctx.rotate(target*Math.PI/180);
+
+ctx.restore();
+// ===== TARGET MELENGKUNG =====
+const boxSize = 12;
+const perfectSize = 18;
+const totalBox = 15;
+const gapAngle = 3; // jarak antar kotak (derajat)
+
+for(let i = 0; i < totalBox; i++){
+
+    // kotak terakhir = PERFECT
+    ctx.fillStyle = (i == 0) ? "#00ff88" : "#FFD54F";
+
+    let a=(target-(totalBox-1-i)*gapAngle)*Math.PI/180;
+
+    let x=cx+Math.cos(a)*r-boxSize/2;
+    let y=cy+Math.sin(a)*r-boxSize/2;
+
+    ctx.save();
+    ctx.translate(x+boxSize/2,y+boxSize/2);
+    ctx.rotate(a+Math.PI/2);
+
+    ctx.fillRect(-boxSize/2,-boxSize/2,boxSize,boxSize);
+
+    ctx.restore();
+}
+// jarum
+ctx.save();
+ctx.translate(cx,cy);
+ctx.rotate(angle);
+ctx.shadowBlur=20;
+ctx.shadowColor="red";
+
+ctx.strokeStyle="red";
+ctx.lineWidth=5;
+ctx.beginPath();
+ctx.moveTo(0,0);
+ctx.lineTo(r,0);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.arc(0,0,30+flash,0,Math.PI*2);
+ctx.fillStyle="orange";
+ctx.fill();
+
+ctx.restore();
+
+if(flash>0) flash-=0.5;
+
+angle+=speed;
+
+requestAnimationFrame(draw);
+
+}
+
+draw();
+
+function show(text,color){
+
+let m=document.getElementById("msg");
+
+m.innerHTML=text;
+m.style.color=color;
+
+m.style.animation="none";
+m.offsetHeight;
+m.style.animation="pop .4s";
+
+}
+
+function shoot(){
+
+flash=5;
+
+let deg=(angle*180/Math.PI)%360;
+if(deg<0)deg+=360;
+
+let diff=Math.abs(deg-target);
+if(diff>180) diff=360-diff;
+
+// PERFECT (1 kotak hijau)
+if(diff<=2){
+
+    perfect++;
+    combo++;
+
+score += 10 + combo;
+
+if(combo % 10 == 0){
+
+    level++;
+
+    speed += 0.01;
+
+    show("LEVEL UP!", "#00ffff");
+
+}
+
+comboText.innerHTML = combo;
+levelText.innerHTML = level;
+scoreText.innerHTML = score;
+
+if(score > highScore){
+
+    highScore = score;
+
+    localStorage.setItem("highScore",highScore);
+
+    high.innerHTML = highScore;
+
+}
+    p.innerHTML=perfect;
+    show("PERFECT","#00ff88");
+    if(combo>=5){
+
+show("🔥 PERFECT x"+combo,"orange");
+
+}
+    newTarget();
+
+}
+// GOOD (6 kotak kuning)
+else if(diff<=20){
+
+    good++;
+
+    combo++;
+
+score += 5;
+
+comboText.innerHTML = combo;
+scoreText.innerHTML = score;
+
+if(score > highScore){
+
+    highScore = score;
+
+    localStorage.setItem("highScore",highScore);
+
+    high.innerHTML = highScore;
+
+}
+    g.innerHTML=good;
+    show("GOOD","#FFD54F");
+    if(combo>=5){
+
+show("🔥 GOOD x"+combo,"orange");
+
+}
+    newTarget();
+
+}
+// GAGAL
+else{
+
+    perfect = 0;
+    good = 0;
+    noob = 0;
+    combo = 0;
+
+lives--;
+
+life.innerHTML = lives;
+
+combo.innerHTML = 0;
+
+show("NOOB","#ff4444");
+
+if(lives<=0){
+
+    alert(
+        "GAME OVER\n\n"+
+        "Score : "+score+
+        "\nLevel : "+level+
+        "\nHigh Score : "+highScore
+    );
+
+    lives=3;
+    score=0;
+    combo=0;
+    level=1;
+    speed=0.06;
+
+    perfect=0;
+    good=0;
+    noob=0;
+
+    p.innerHTML=0;
+    g.innerHTML=0;
+    n.innerHTML=0;
+
+    scoreText.innerHTML=0;
+    comboText.innerHTML=0;
+    levelText.innerHTML=1;
+    life.innerHTML=3;
+
+    newTarget();
+
+}
+
+    document.getElementById("p").innerHTML = perfect;
+    document.getElementById("g").innerHTML = good;
+    document.getElementById("n").innerHTML = noob;
+
+    show("NOOB","#ff4444");
+
+}
+}
+</script>
+
+</body>
+                   </html>
